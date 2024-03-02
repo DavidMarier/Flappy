@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using UnityEngine.UI;
 
 public class ControleFlappy : MonoBehaviour
 {
@@ -11,9 +12,12 @@ public class ControleFlappy : MonoBehaviour
     public float vitesseY;
     public bool flappyBlesse;
     public bool finDePartie;
-    public int pointage;
+    public int pointage = 0;
 
-    /*public TextMeshProUGUI;*/
+    public TextMeshProUGUI txtPointage;
+    public TextMeshProUGUI txtFinPartie;
+
+    public Color controleAlpha;
 
     public Sprite flappySpriteBlesse;
     public Sprite flappySpriteBlesseAile;
@@ -32,7 +36,11 @@ public class ControleFlappy : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        /*InvokeRepeating("nomFonction", 1f, 1f)*/;
+        txtFinPartie.GetComponent<TextMeshProUGUI>().fontSize = 0;
+        
+        controleAlpha = txtFinPartie.GetComponent<TextMeshProUGUI>().color;
+        controleAlpha.a = -0f;
+        txtFinPartie.GetComponent<TextMeshProUGUI>().color = controleAlpha;
     }
 
     // Update is called once per frame
@@ -80,50 +88,67 @@ public class ControleFlappy : MonoBehaviour
             Invoke("recommencerPartie", 3f);
             flappyBlesse = false;
         }
+        if(finDePartie == true){
+            if(txtFinPartie.GetComponent<TextMeshProUGUI>().fontSize < 100){
+                    txtFinPartie.GetComponent<TextMeshProUGUI>().fontSize += 0.2f;
+            }
+            controleAlpha.a += 0.002f;
+            txtFinPartie.GetComponent<TextMeshProUGUI>().color = controleAlpha;
+        }
+
     }
         
     void OnCollisionEnter2D(Collision2D flappy){
-            if(flappy.gameObject.name == "Colonne_0" || flappy.gameObject.name == "Colonne_1"){
-                GetComponent<SpriteRenderer>().sprite = flappySpriteBlesse;
-                GetComponent<AudioSource>().PlayOneShot(sonCol);
-                if(flappyBlesse == false){
-                    flappyBlesse = true;
-                }
-                else{
-                    flappyBlesse = true;
-                    finDePartie = true;
-                    GetComponent<Rigidbody2D>().freezeRotation = false;
-                    GetComponent<Collider2D>().enabled = false;
-                    GetComponent<AudioSource>().PlayOneShot(sonFinDePartie);
-                }
+        if(flappy.gameObject.name == "Colonne_0" || flappy.gameObject.name == "Colonne_1" || flappy.gameObject.name == "Decor"){
+            GetComponent<SpriteRenderer>().sprite = flappySpriteBlesse;
+            GetComponent<AudioSource>().PlayOneShot(sonCol);
+            pointage -= 5;
+            txtPointage.text = "Pointage : " + pointage;
+            if(flappyBlesse == false){
+                flappyBlesse = true;
             }
-            else if(flappy.gameObject.name == "PieceOr_0"){
-                flappy.gameObject.SetActive(false);
-                Invoke("activePiece", 3.5f);
-                pieceOr.transform.position = new Vector2(pieceOr.transform.position.x, Random.Range(-2f, 2f));
-                GetComponent<AudioSource>().PlayOneShot(sonOr);
-            }
-            else if(flappy.gameObject.name == "PackVie_0"){
-                flappy.gameObject.SetActive(false);
-                GetComponent<SpriteRenderer>().sprite = flappySpriteNormal;
-                Invoke("activePack", 3.5f);
-                packVie.transform.position = new Vector2(packVie.transform.position.x, Random.Range(-2f, 2f));
-                GetComponent<AudioSource>().PlayOneShot(sonPack);
-                if(flappyBlesse == true){
-                    flappyBlesse = false;
-                }
-                else{
-                    flappyBlesse = false;
-                }
-            }
-            else if(flappy.gameObject.name == "Champingon_0"){
-                flappy.gameObject.SetActive(false);
-                transform.localScale *= 1.3f;
-                Invoke("activeChampingon", 3.5f);
-                champingon.transform.position = new Vector2(champingon.transform.position.x, Random.Range(-2f, 2f));
-                GetComponent<AudioSource>().PlayOneShot(sonChamp);
+            else{
+                flappyBlesse = true;
+                finDePartie = true;
+                GetComponent<Rigidbody2D>().freezeRotation = false;
+                GetComponent<Collider2D>().enabled = false;
+                GetComponent<AudioSource>().PlayOneShot(sonFinDePartie);
+                txtFinPartie.gameObject.SetActive(true);
             }
         }
+        else if(flappy.gameObject.name == "PieceOr_0"){
+            flappy.gameObject.SetActive(false);
+            Invoke("activePiece", 3.5f);
+            pieceOr.transform.position = new Vector2(pieceOr.transform.position.x, Random.Range(-2f, 2f));
+            GetComponent<AudioSource>().PlayOneShot(sonOr);
+            pointage += 5;
+            txtPointage.text = "Pointage : " + pointage;
+        }
+        else if(flappy.gameObject.name == "PackVie_0"){
+            flappy.gameObject.SetActive(false);
+            GetComponent<SpriteRenderer>().sprite = flappySpriteNormal;
+            Invoke("activePack", 3.5f);
+            packVie.transform.position = new Vector2(packVie.transform.position.x, Random.Range(-2f, 2f));
+            GetComponent<AudioSource>().PlayOneShot(sonPack);
+            pointage += 5;
+            txtPointage.text = "Pointage : " + pointage;
+            if(flappyBlesse == true){
+                flappyBlesse = false;
+            }
+            else{
+                flappyBlesse = false;
+            }
+        }
+        else if(flappy.gameObject.name == "Champingon_0"){
+            flappy.gameObject.SetActive(false);
+            transform.localScale *= 1.3f;
+            Invoke("activeChampingon", 3.5f);
+            champingon.transform.position = new Vector2(champingon.transform.position.x, Random.Range(-2f, 2f));
+            GetComponent<AudioSource>().PlayOneShot(sonChamp);
+            pointage += 10;
+            txtPointage.text = "Pointage : " + pointage;
+        }
+    }
 
     void activePiece(){
         pieceOr.SetActive(true);  
