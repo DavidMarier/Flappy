@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
+using Unity.Android.Gradle;
 
 public class ControleFlappy : MonoBehaviour
 {
@@ -27,6 +28,7 @@ public class ControleFlappy : MonoBehaviour
     public GameObject pieceOr;
     public GameObject packVie;
     public GameObject champingon;
+    public GameObject grille;
 
     public AudioClip sonCol;
     public AudioClip sonOr;
@@ -41,6 +43,8 @@ public class ControleFlappy : MonoBehaviour
         controleAlpha = txtFinPartie.GetComponent<TextMeshProUGUI>().color;
         controleAlpha.a = -0f;
         txtFinPartie.GetComponent<TextMeshProUGUI>().color = controleAlpha;
+
+        grille = GameObject.Find("grille");
     }
 
     // Update is called once per frame
@@ -123,6 +127,9 @@ public class ControleFlappy : MonoBehaviour
             GetComponent<AudioSource>().PlayOneShot(sonOr);
             pointage += 5;
             txtPointage.text = "Pointage : " + pointage;
+            grille.GetComponent<Animator>().enabled = true;
+            Invoke("fermerGrille", 4f);
+            
         }
         else if(flappy.gameObject.name == "PackVie_0"){
             flappy.gameObject.SetActive(false);
@@ -164,5 +171,8 @@ public class ControleFlappy : MonoBehaviour
         finDePartie = false;
         flappyBlesse = false;
         SceneManager.LoadScene("SampleScene");
+    }
+    void fermerGrille(){
+        grille.GetComponent<Animator>().enabled = false;
     }
 }
